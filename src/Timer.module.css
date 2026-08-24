@@ -1,0 +1,33 @@
+.Timer {
+  flex: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #2d3748;
+  padding: 1.5rem 3rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  font-family: 'Courier New', monospace;
+}
+
+.Timer.Warning {
+  color: #ecc94b;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.Timer.Expired {
+  color: #fc8181;
+  animation: pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
