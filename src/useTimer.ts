@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useEffectEvent, useRef } from "react";
 import type { UseTimerInput, UseTimerOutput } from "./timerTypes";
 
 const useTimer = ({
@@ -13,6 +13,10 @@ const useTimer = ({
   const timeoutIdRef = useRef<number | null>(null);
   const isIntervalStartRef = useRef<boolean>(false);
   const isIntervalEndRef = useRef<boolean>(false);
+
+  const handleStart = useEffectEvent((value: number) => onStart?.(value));
+  const handleEnd = useEffectEvent((value: number) => onEnd?.(value));
+  const handleStep = useEffectEvent((value: number) => onStep(value));
 
   const hasTimerEnd = value <= 0;
 
@@ -35,24 +39,24 @@ const useTimer = ({
   useEffect(() => {
     if (hasTimerEnd && !isIntervalEndRef.current) {
       setTimerEndInterval();
-      onEnd?.(value);
+      handleEnd(value);
 
       return;
     }
 
     if (!isIntervalStartRef.current) {
       setTimerStartInterval();
-      onStart?.(value);
+      handleStart(value);
     }
 
     timeoutIdRef.current = setTimeout(() => {
       const calculatedValue = Math.max(0, value - step);
 
-      onStep(calculatedValue);
+      handleStep(calculatedValue);
     }, step);
 
     return () => clearTimerTimeout();
-  }, [value, step, hasTimerEnd, onStart, onEnd, onStep]);
+  }, [value, step, hasTimerEnd]);
 
   return { value, separator };
 }
