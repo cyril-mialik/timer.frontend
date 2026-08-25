@@ -1,33 +1,37 @@
-import { useCallback, useState } from 'react';
-import './App.css'
+import { useReducer, useCallback } from 'react';
 import Timer from './Timer'
+import useTimer from './useTimer';
+import { timerReducer } from './timerReducer';
+import { initialState, TIMER_ACTION } from './timerConstants';
 
 function App() {
-  const [targetTime] = useState(() => new Date(Date.now() + 1 * 60 * 1000));
+  const [state, dispatch] = useReducer(timerReducer, initialState);
 
-  const handleStart = useCallback((time: number) => {
-    console.log('The timer is started!', time);
+  const handleStart = useCallback((value: number) => {
+    dispatch({ type: TIMER_ACTION.START });
+    console.log('The timer is started!', value);
   }, []);
 
-  const handleStep = useCallback((time: number) => {
-    console.log('The step of the timer:', time);
+  const handleEnd = useCallback((value: number) => {
+    dispatch({ type: TIMER_ACTION.END })
+    console.log('Timer has ended!', value);
   }, []);
 
-  const handleEnd = useCallback((time: number) => {
-    console.log('Timer has ended!', time);
+  const handleStep = useCallback((value: number) => {
+    dispatch({ type: TIMER_ACTION.STEP, payload: value })
+    console.log('The step of the timer:', value);
   }, []);
 
-  const timerOptions = {
-    value: targetTime,
+  const timer = useTimer({
+    value: state.value,
     separator: ':',
     step: 1000,
-  }
+    onStart: handleStart,
+    onEnd: handleEnd,
+    onStep: handleStep,
+  });
 
-  return (
-    <>
-      <Timer {...timerOptions} onStep={handleStep} onStart={handleStart} onEnd={handleEnd} />
-    </>
-  )
+  return <Timer {...timer} />
 }
 
 export default App
