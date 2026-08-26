@@ -11,52 +11,45 @@ const useTimer = ({
   onStep,
 }: UseTimerInput): UseTimerOutput => {
   const timeoutIdRef = useRef<number | null>(null);
-  const isIntervalStartRef = useRef<boolean>(false);
-  const isIntervalEndRef = useRef<boolean>(false);
+  const isTimeoutStartRef = useRef<boolean>(false);
+  const isTimeoutEndRef = useRef<boolean>(false);
 
   const handleStart = useEffectEvent((value: number) => onStart?.(value));
   const handleEnd = useEffectEvent((value: number) => onEnd?.(value));
   const handleStep = useEffectEvent((value: number) => onStep(value));
 
-  const hasTimerEnd = value <= 0;
+  const setTimerTimeout = useEffectEvent((value: number) => setTimeout(() => {
+    const calculatedValue = Math.max(0, value - step);
 
-  const clearTimerTimeout = () => {
+    handleStep(calculatedValue);
+  }, step));
+
+  const clearTimerTimeout = useEffectEvent(() => {
     if (!timeoutIdRef.current) {
       return;
     }
 
     clearTimeout(timeoutIdRef.current);
-  }
+  });
 
-  const setTimerStartInterval = (state = true) => {
-    isIntervalStartRef.current = state;
-  };
-
-  const setTimerEndInterval = (state = true) => {
-    isIntervalEndRef.current = state;
-  };
+  const checkTimerEnd = useEffectEvent(() => value <= 0);
 
   useEffect(() => {
-    if (hasTimerEnd && !isIntervalEndRef.current) {
-      setTimerEndInterval();
+    if (!isTimeoutEndRef.current && checkTimerEnd()) {
+      isTimeoutEndRef.current = true;
       handleEnd(value);
 
       return;
     }
 
-    if (!isIntervalStartRef.current) {
-      setTimerStartInterval();
+    if (!isTimeoutStartRef.current) {
+      isTimeoutStartRef.current = true;
       handleStart(value);
     }
 
-    timeoutIdRef.current = setTimeout(() => {
-      const calculatedValue = Math.max(0, value - step);
-
-      handleStep(calculatedValue);
-    }, step);
-
+    timeoutIdRef.current = setTimerTimeout(value);
     return () => clearTimerTimeout();
-  }, [value, step, hasTimerEnd]);
+  }, [value]);
 
   return { value, separator };
 }

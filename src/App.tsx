@@ -1,24 +1,24 @@
 import { useReducer, useCallback } from 'react';
 import Timer from './Timer'
 import useTimer from './useTimer';
-import { timerReducer } from './timerReducer';
-import { initialState, TIMER_ACTION } from './timerConstants';
+import { timerReducer, timerEndDispatcher, timerStartDispatcher, timerStepDispatcher } from './timerReducer';
+import { initialState } from './timerConstants';
 
 function App() {
   const [state, dispatch] = useReducer(timerReducer, initialState);
 
   const handleStart = useCallback((value: number) => {
-    dispatch({ type: TIMER_ACTION.START });
+    dispatch(timerStartDispatcher());
     console.log('The timer is started!', value);
   }, []);
 
   const handleEnd = useCallback((value: number) => {
-    dispatch({ type: TIMER_ACTION.END })
+    dispatch(timerEndDispatcher());
     console.log('Timer has ended!', value);
   }, []);
 
   const handleStep = useCallback((value: number) => {
-    dispatch({ type: TIMER_ACTION.STEP, payload: value })
+    dispatch(timerStepDispatcher(value));
     console.log('The step of the timer:', value);
   }, []);
 
