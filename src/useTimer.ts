@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useRef } from "react";
-import type { UseTimerInput, UseTimerOutput } from "./timerTypes";
+import type { TimerInput, UseTimerInput, UseTimerOutput } from "./timerTypes";
 
 const useTimer = ({
   value,
@@ -16,12 +16,10 @@ const useTimer = ({
 
   const handleStart = useEffectEvent((value: number) => onStart?.(value));
   const handleEnd = useEffectEvent((value: number) => onEnd?.(value));
-  const handleStep = useEffectEvent((value: number) => onStep(value));
+  const handleStep = useEffectEvent(({ value, step }: TimerInput) => onStep({ value, step }));
 
   const setTimerTimeout = useEffectEvent((value: number) => setTimeout(() => {
-    const calculatedValue = Math.max(0, value - step);
-
-    handleStep(calculatedValue);
+    handleStep({ value, step });
   }, step));
 
   const clearTimerTimeout = useEffectEvent(() => {
@@ -51,7 +49,7 @@ const useTimer = ({
     return () => clearTimerTimeout();
   }, [value]);
 
-  return { value, separator };
+  return { value, separator, step };
 }
 
 export default useTimer;

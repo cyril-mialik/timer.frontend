@@ -8,4 +8,6 @@ export const TIMER_ACTION = {
 
 export const initialState = {
   value: 5 * 60 * 1000,
+  step: 1000,
+  separator: ':',
 } satisfies TimerState;
